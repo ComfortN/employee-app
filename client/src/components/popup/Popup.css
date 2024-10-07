@@ -1,0 +1,25 @@
+.popup {
+    position: fixed;
+    top:20px;
+    left: 50%;
+    background-color: #92A4B1;
+    padding: 20px;
+    border-radius: 5px;
+    color: white;
+    z-index: 1000;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+.popup-content {
+    text-align: center;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeout {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}

@@ -1,0 +1,54 @@
+.dashboard {
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+  }
+  
+  .dashboard h1 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .dashboard-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+  }
+  
+  .summary-card {
+    background: #f1f1f1;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    width: 30%;
+  }
+  
+  .summary-card h2 {
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .summary-card p, .summary-card ul {
+    color: #555;
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-summary{
+      justify-content: space-between;
+    }
+  
+    .summary-card {
+      padding: 0;
+      width: 40%;
+    }
+
+    .summary-card h2 {
+      font-size: medium;
+    }
+  
+    .dashboard h1 {
+      font-size: 1.5rem;
+    }
+  }
