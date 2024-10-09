@@ -13,9 +13,9 @@ exports.getAllEmployees = async (req, res) => {
 
 exports.addEmployee = async (req, res) => {
     try {
-        const { name, email, phone, position, id } = req.body;
+        const { name, surname, age, position, id, image } = req.body;
         await db.collection('employees').doc(id).set({
-        name, email, phone, position, id
+        name, surname, age, position, id, image
         });
         res.status(201).json({ message: 'Employee added successfully' });
     } catch (error) {
@@ -27,9 +27,9 @@ exports.addEmployee = async (req, res) => {
 exports.updateEmployee = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, email, phone, position } = req.body;
+        const { name, surname, age, position, image } = req.body;
         await db.collection('employees').doc(id).update({
-            name, email, phone, position
+            name, surname, age, position, image
         });
         res.json({ message: 'Employee updated successfully' });
     } catch (error) {

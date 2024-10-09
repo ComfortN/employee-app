@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const employeeController = require('./controllers/employeeController');
 const authMiddleware = require('./middleware/auth');
+const adminController = require('./controllers/adminController')
 
 const app = express();
 
@@ -11,17 +12,21 @@ app.use(express.json());
 // Employee routes
 const router = express.Router();
 
-router.use(authMiddleware);
-
-
 router.get('/', employeeController.getAllEmployees);
 router.post('/', employeeController.addEmployee);
 router.put('/:id', employeeController.updateEmployee);
 router.delete('/:id', employeeController.deleteEmployee);
 router.get('/former', employeeController.getAllFormerEmployees);
 
+// Admin routes
+const adminRouter = express.Router();
+
+adminRouter.post('/add', adminController.addAdmin);
+adminRouter.delete('/remove/:uid', adminController.removeAdmin);
+adminRouter.get('/profile', adminController.getAdminProfile);
 
 app.use('/api/employees', router);
+app.use('/api/admin', adminRouter);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
