@@ -22,6 +22,7 @@ router.get('/former', employeeController.getAllFormerEmployees);
 const adminRouter = express.Router();
 
 adminRouter.post('/add', adminController.addAdmin);
+adminRouter.get('/all', adminController.getAllAdmins);
 adminRouter.delete('/remove/:uid', adminController.removeAdmin);
 adminRouter.get('/profile', adminController.getAdminProfile);
 

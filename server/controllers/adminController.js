@@ -37,6 +37,28 @@ exports.removeAdmin = async (req, res) => {
   }
 };
 
+
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const adminsCollection = await admin.firestore().collection('admins').get();
+    
+    if (adminsCollection.empty) {
+      return res.status(404).send('No admins found');
+    }
+
+    const admins = [];
+    adminsCollection.forEach(doc => {
+      admins.push({ uid: doc.id, ...doc.data() });
+    });
+
+    res.json(admins);
+  } catch (error) {
+    console.error('Error fetching admins:', error);
+    res.status(500).send('Failed to fetch admins');
+  }
+};
+
+
 exports.getAdminProfile = async (req, res) => {
   try {
     const uid = req.user.uid; // Assuming the auth middleware adds the user to the request
