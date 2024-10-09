@@ -64,6 +64,18 @@ ul li a.active {
 }
 
 
+.view-profile-link {
+    display: block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .view-profile-link:hover {
+    text-decoration: underline;
+  }
+
+
 @media (min-width: 768px) {
     .sidebar {
       width: 240px;

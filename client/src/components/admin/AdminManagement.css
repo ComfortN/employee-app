@@ -1,0 +1,54 @@
+.admin-management {
+    padding: 20px;
+  }
+  
+  .admin-management h2 {
+    margin-bottom: 20px;
+  }
+  
+  .admin-management button {
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .admin-management button:hover {
+    background-color: #0056b3;
+  }
+  
+  .admin-list table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .admin-list th, .admin-list td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .admin-list th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+  }
+  
+  .admin-list tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .admin-list button {
+    padding: 5px 10px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  
+  .admin-list button:hover {
+    background-color: #c82333;
+  }
