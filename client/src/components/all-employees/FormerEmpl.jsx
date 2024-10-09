@@ -12,9 +12,10 @@ export default function FormerEmployees({ title, employees, onEmployeeClick }) {
       <table>
         <thead>
           <tr>
+            <th>Image</th>
             <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
+            <th>Surname</th>
+            <th>Age</th>
             <th>Position</th>
             <th>ID</th>
           </tr>
@@ -22,9 +23,12 @@ export default function FormerEmployees({ title, employees, onEmployeeClick }) {
         <tbody>
           {employees.map(employee => (
             <tr key={employee.id} onClick={() => onEmployeeClick(employee)}>
+              <td data-label="Image">
+                <img src={employee.image || 'default-avatar.png'} alt={employee.name} style={{width: '50px', height: '50px', objectFit: 'cover'}} />
+              </td>
               <td data-label="Name">{employee.name}</td>
-              <td data-label="Email">{employee.email}</td>
-              <td data-label="Phone">{employee.phone}</td>
+              <td data-label="Email">{employee.surname}</td>
+              <td data-label="Phone">{employee.age}</td>
               <td data-label="Position">{employee.position}</td>
               <td data-label="ID">{employee.id}</td>
             </tr>

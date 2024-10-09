@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import { storage } from '../../firebase/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import axios from 'axios';
 import Popup from '../popup/Popup';
 import './AddEmployee.css'
@@ -6,33 +8,45 @@ import './AddEmployee.css'
 export default function AddEmployee({addEmployee, updateEmployee, isEditing, onDelete, currentEmployee, setIsEditing, viewOnly, setViewOnly, setLoading}) {
     const [employee, setEmployee] = useState({
         name: '',
-        email: '',
-        phone: '',
+        surname: '',
+        age: '',
         image: '',
         position: '',
         id: ''
     });
     const [errors, setErrors] = useState({})
+    const [imageFile, setImageFile] = useState(null);
     const [imagePreview, setImagePreview] = useState('default-avatar.png');
     const [popupMessage, setPopupMessage] = useState('');
     const [showPopup, setShowPopup] = useState(false);
     
+    // useEffect(() => {
+    //     if (isEditing && currentEmployee ) {
+    //         setEmployee(currentEmployee);
+    //         if (currentEmployee.image) {
+    //             // Check if the image is a Blob or File object
+    //             if (currentEmployee.image instanceof Blob || currentEmployee.image instanceof File) {
+    //                 setImagePreview(currentEmployee.image);
+    //             } else {
+    //                 setImagePreview(currentEmployee.image);
+    //             }
+    //         } else {
+    //             setImagePreview('default-avatar.png');
+    //         }
+    //     }
+    // }, [isEditing, currentEmployee]);
+    
+
     useEffect(() => {
-        if (isEditing && currentEmployee ) {
+        if (isEditing && currentEmployee) {
             setEmployee(currentEmployee);
             if (currentEmployee.image) {
-                // Check if the image is a Blob or File object
-                if (currentEmployee.image instanceof Blob || currentEmployee.image instanceof File) {
-                    setImagePreview(URL.createObjectURL(currentEmployee.image));
-                } else {
-                    setImagePreview(currentEmployee.image);
-                }
+                setImagePreview(currentEmployee.image);
             } else {
                 setImagePreview('default-avatar.png');
             }
         }
     }, [isEditing, currentEmployee]);
-    
 
     const validate = () => {
         const errors = {};
@@ -50,50 +64,103 @@ export default function AddEmployee({addEmployee, updateEmployee, isEditing, onD
     };
 
 
+    // const handleChange = (e) => {
+    //     const { name, value, files } = e.target;
+    //     if (name === 'image' && files[0]) {
+    //         const file = files[0];
+            
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => {
+    //             setEmployee({ ...employee, image: reader.result });
+    //             setImagePreview(reader.result);
+    //         };
+    //         reader.readAsDataURL(file);
+    //     } else {
+    //         setEmployee({ ...employee, [name]: value });
+    //     }
+    // };
+    
+
     const handleChange = (e) => {
         const { name, value, files } = e.target;
         if (name === 'image' && files[0]) {
-            const file = files[0];
-            
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setEmployee({ ...employee, image: reader.result });
-                setImagePreview(reader.result);
-            };
-            reader.readAsDataURL(file);
+            setImageFile(files[0]);
+            setImagePreview(URL.createObjectURL(files[0]));
         } else {
             setEmployee({ ...employee, [name]: value });
         }
     };
-    
+
+
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     // if (validate()) {
+    //         // setLoading(true);
+    //         try {
+    //         if (isEditing) {
+    //             // updateEmployee(employee);
+    //             await axios.put(`http://localhost:5000/api/employees/${employee.id}`, employee);
+    //             setIsEditing(false);
+    //             showAlert('Employee updated successfully!');
+    //         } else {
+    //             // addEmployee(employee);
+    //             await axios.post('http://localhost:5000/api/employees', employee);
+    //             showAlert('Employee added successfully!');
+    //         }
+    //         setEmployee({
+    //             name: '',
+    //             surname: '',
+    //             age: '',
+    //             image: '',
+    //             position: '',
+    //             id: ''
+    //         });
+    //         setImagePreview('default-avatar.png');
+    //     } catch (error) {
+    //         showAlert(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
+    //     } 
+    //     // }
+    // };
+
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (validate()) {
-            // setLoading(true);
-            try {
+        // setLoading(true);
+        try {
+            let imageUrl = employee.image;
+            if (imageFile) {
+                const storageRef = ref(storage, `employee_images/${employee.id}`);
+                await uploadBytes(storageRef, imageFile);
+                imageUrl = await getDownloadURL(storageRef);
+            }
+
+            const employeeData = { ...employee, image: imageUrl };
+
             if (isEditing) {
-                // updateEmployee(employee);
-                await axios.put(`http://localhost:5000/api/employees/${employee.id}`, employee);
+                await axios.put(`http://localhost:5000/api/employees/${employee.id}`, employeeData);
+                updateEmployee(employeeData);
                 setIsEditing(false);
                 showAlert('Employee updated successfully!');
             } else {
-                // addEmployee(employee);
-                await axios.post('http://localhost:5000/api/employees', employee);
+                await axios.post('http://localhost:5000/api/employees', employeeData);
+                addEmployee(employeeData);
                 showAlert('Employee added successfully!');
             }
+
             setEmployee({
                 name: '',
-                email: '',
-                phone: '',
+                surname: '',
+                age: '',
                 image: '',
                 position: '',
                 id: ''
             });
             setImagePreview('default-avatar.png');
+            setImageFile(null);
         } catch (error) {
             showAlert(`Error: ${error.response?.data?.error || 'Something went wrong'}`);
-        } 
         }
+        
     };
 
 
@@ -134,10 +201,10 @@ return (
         
         <input type="text" name="name" value={employee.name} onChange={handleChange} placeholder="Name" required disabled={viewOnly} />
         {errors.name && <p className="error">{errors.name}</p>}
-        <input type="email" name="email" value={employee.email} onChange={handleChange} placeholder="Email" required disabled={viewOnly}  />
-        {errors.email && <p className="error">{errors.email}</p>}
-        <input type="tel" name="phone" value={employee.phone} onChange={handleChange} placeholder="Phone" required disabled={viewOnly} />
-        {errors.phone && <p className="error">{errors.phone}</p>}
+        <input type="text" name="surname" value={employee.surname} onChange={handleChange} placeholder="Surname" required disabled={viewOnly}  />
+        {errors.surname && <p className="error">{errors.surname}</p>}
+        <input type="number" name="age" value={employee.age} onChange={handleChange} placeholder="Age" required disabled={viewOnly} />
+        {errors.age && <p className="error">{errors.age}</p>}
         <input type="text" name="position" value={employee.position} onChange={handleChange} placeholder="Position" required disabled={viewOnly}  />
         {errors.position && <p className="error">{errors.position}</p>}
         <input type="text" name="id" value={employee.id} onChange={handleChange} placeholder="ID" required disabled={viewOnly} />

@@ -12,6 +12,9 @@ import Login from './components/login/login';
 import Modal from './components/model/Modal';
 import Loader from './components/Loader/Loader';
 import axios from 'axios';
+import AdminLogin from './components/admin/AdminLogin';
+import AdminManagement from './components/admin/AdminManagement';
+import AdminProfile from './components/admin/AdminProfile';
 
 
 function App() {
@@ -21,6 +24,7 @@ function App() {
   });
   
   const [showNav, setShowNav] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentEmployee, setCurrentEmployee] = useState(null);
   const [formerEmployees, setFormerEmployees] = useState([]);
@@ -40,45 +44,42 @@ function App() {
   
 
   // useEffect(() => {
-  //   const storedAuth = localStorage.getItem('isAuthenticated') === 'true';
-  //   setIsAuthenticated(storedAuth);
+  //   const unsubscribe = onAuthStateChanged(auth, async (user) => {
+  //     if (user) {
+  //       setIsAuthenticated(true);
+  //       fetchEmployees();
+  //       fetchFormerEmployees();
+  //     } else {
+  //       setIsAuthenticated(false);
+  //       setIsAdmin(false);
+  //     }
+  //   });
 
-  //   const storedEmployees = localStorage.getItem('employees');
-  //   const storedFormerEmployees = localStorage.getItem('formerEmployees');
-  //   if (storedEmployees) {
-  //     console.log('Loaded employees from localStorage:', JSON.parse(storedEmployees));
-  //     setEmployees(JSON.parse(storedEmployees));
-  //   }
-  //   if (storedFormerEmployees) {
-  //     console.log('Loaded former employees from localStorage:', JSON.parse(storedFormerEmployees));
-  //     setFormerEmployees(JSON.parse(storedFormerEmployees));
-  //   }
-
-  //   setInitialse(true);
+  //   return () => unsubscribe();
   // }, []);
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //   console.log('Saving employees to localStorage:', employees);
-  //   localStorage.setItem('isAuthenticated', isAuthenticated.toString());
-  //   localStorage.setItem('employees', JSON.stringify(employees));
-  //   localStorage.setItem('formerEmployees', JSON.stringify(formerEmployees));
-  //   },1);
-  // }, [isAuthenticated, employees, formerEmployees]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAuthenticated(true);
+        // Check if the user is an admin
+        try {
+          const idTokenResult = await user.getIdTokenResult();
+          setIsAdmin(!!idTokenResult.claims.admin);
+        } catch (error) {
+          console.error("Error checking admin status:", error);
+        }
         fetchEmployees();
         fetchFormerEmployees();
       } else {
         setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     });
-
     return () => unsubscribe();
   }, []);
+
 
   const fetchEmployees = async () => {
     setLoading(true);
@@ -119,10 +120,6 @@ function App() {
 
 
   const handleLogout = async () => {
-    // setIsAuthenticated(false);
-    // localStorage.removeItem('isAuthenticated');
-    // localStorage.removeItem('employees');
-    // localStorage.removeItem('formerEmployees');
     try {
       await auth.signOut();
       setIsAuthenticated(false);
@@ -162,12 +159,6 @@ function App() {
   };
 
 
-  // if(!initialise) {
-  //   return <div>Loading...</div>
-  // }
-
-
-
   return (
     <div className="App">
       
@@ -175,7 +166,7 @@ function App() {
     <>
       <Router>
         
-      {isAuthenticated && (
+      {isAuthenticated  && (
         <>
           <Header
           showNav={showNav}
@@ -186,18 +177,22 @@ function App() {
           deleteEmployee={deleteEmployee}
           employees={employees}
           moveToFormer={moveToFormerEmployees}
+          isAdmin={isAdmin}
           />
-          <SideNav show={showNav} adminDetails={adminDetails} />
+          <SideNav show={showNav} adminDetails={adminDetails} isAdmin={isAdmin} />
         </>
       )}
         
       
-        <div className={isAuthenticated ? 'main': ''}>
+        <div className={isAuthenticated  ? 'main' : ''}>
           <Routes>
             <Route path='/login' element={<Login onLogin={handleLogin}  setLoading={ setLoading}/>} />
+            <Route path='/admin-login' element={<AdminLogin onLogin={handleLogin} />} />
             <Route path='/' element={isAuthenticated ? <Home employees={employees} formerEmployees={formerEmployees} onEmployeeClick={handleEmployeeClick} setLoading={ setLoading}/> : <Navigate to={"/login"}/>} />
             <Route path='/all-employees' element={isAuthenticated ? <AllEmployees title="All Employees" employees={employees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
             <Route path='/former-employees' element={isAuthenticated ? <AllEmployees title="Former Employees" employees={formerEmployees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
+            <Route path='/admin-management' element={isAuthenticated && isAdmin ? <AdminManagement /> : <Navigate to={"/login"}/>} />
+            <Route path='/admin-profile' element={isAuthenticated && isAdmin ? <AdminProfile /> : <Navigate to={"/login"}/>} />
 
           </Routes>
           
