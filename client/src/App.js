@@ -23,7 +23,6 @@ function App() {
   });
   
   const [showNav, setShowNav] = useState(false)
-  // const [isAdmin, setIsAdmin] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentEmployee, setCurrentEmployee] = useState(null);
@@ -31,7 +30,6 @@ function App() {
   const [isEditing, setIsEditing] = useState(false);
   const [viewOnly, setViewOnly] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [initialise, setInitialse] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -43,22 +41,6 @@ function App() {
   };
   
 
-  // useEffect(() => {
-  //   const unsubscribe = onAuthStateChanged(auth, async (user) => {
-  //     if (user) {
-  //       setIsAuthenticated(true);
-  //       fetchEmployees();
-  //       fetchFormerEmployees();
-  //     } else {
-  //       setIsAuthenticated(false);
-  //       setIsAdmin(false);
-  //     }
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
-
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -67,7 +49,7 @@ function App() {
         try {
           const idTokenResult = await user.getIdTokenResult();
           // setIsAdmin(!!idTokenResult.claims.admin);
-          setIsSuperAdmin(user.email === 'admin@citismart.com');
+          setIsSuperAdmin(user.email === 'nami@gmail.com');
         } catch (error) {
           console.error("Error checking admin status:", error);
         }

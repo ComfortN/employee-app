@@ -38,22 +38,6 @@ export default function Header({ showNav, setShowNav, handleLogout, addEmployee,
   };
 
 
-  // const handleSearch = () => {
-  //   const employee = employees.find(emp => emp.id === searchQuery) || formerEmployees.find(emp => emp.id === searchQuery);
-  //   if (employee) {
-  //     console.log('Searched Employee:', employee);
-  //     setCurrentEmployee(employee)
-  //     setSearchResult(employee);
-  //     setIsModalOpen(true);
-  //     setIsEditing(true);
-  //     setViewOnly(true);
-  //   } else {
-  //     setSearchResult(null);
-  //     showAlert('Employee not found');
-  //   }
-  // };
-
-
   const handleSearch = () => {
     const employeeList = employees || [];
     const formerEmployeeList = formerEmployees || [];
@@ -125,6 +109,7 @@ export default function Header({ showNav, setShowNav, handleLogout, addEmployee,
           {isAllEmployeesPage && (
           <button className="add-employee-button" onClick={handleAddEmployee}>Add Employee</button>
         )}
+        
         {isHomePage && (
           <button className="logout-button" onClick={handleLogoutConfirmation}>Logout</button>
         )}
