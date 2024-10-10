@@ -1,9 +1,10 @@
 const admin = require('../firebase/firebase');
 
-module.exports = async (req, res, next) => {
+  module.exports = async (req, res, next) => {
   const token = req.headers.authorization?.split('Bearer ')[1];
   
   if (!token) {
+    console.log('backend token: ', token)
     return res.status(401).json({ error: 'No token provided' });
   }
 

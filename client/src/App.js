@@ -12,7 +12,6 @@ import Login from './components/login/login';
 import Modal from './components/model/Modal';
 import Loader from './components/Loader/Loader';
 import axios from 'axios';
-import AdminLogin from './components/admin/AdminLogin';
 import AdminManagement from './components/admin/AdminManagement';
 import AdminProfile from './components/admin/AdminProfile';
 
@@ -187,12 +186,11 @@ function App() {
         <div className={isAuthenticated  ? 'main' : ''}>
           <Routes>
             <Route path='/login' element={<Login onLogin={handleLogin}  setLoading={ setLoading}/>} />
-            <Route path='/admin-login' element={<AdminLogin onLogin={handleLogin} />} />
             <Route path='/' element={isAuthenticated ? <Home employees={employees} formerEmployees={formerEmployees} onEmployeeClick={handleEmployeeClick} setLoading={ setLoading}/> : <Navigate to={"/login"}/>} />
             <Route path='/all-employees' element={isAuthenticated ? <AllEmployees title="All Employees" employees={employees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
             <Route path='/former-employees' element={isAuthenticated ? <AllEmployees title="Former Employees" employees={formerEmployees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
-            <Route path='/admin-management' element={isAuthenticated && isAdmin ? <AdminManagement /> : <Navigate to={"/login"}/>} />
-            <Route path='/admin-profile' element={isAuthenticated && isAdmin ? <AdminProfile /> : <Navigate to={"/login"}/>} />
+            <Route path='/admin-management' element={isAuthenticated ? <AdminManagement /> : <Navigate to={"/login"}/>} />
+            <Route path='/admin-profile' element={isAuthenticated ? <AdminProfile /> : <Navigate to={"/login"}/>} />
 
           </Routes>
           
