@@ -88,6 +88,7 @@ if (loading) return <Loader />;
         <table>
           <thead>
             <tr>
+              <th>Image</th>
               <th>Name</th>
               <th>Surname</th>
               <th>Email</th>
@@ -100,6 +101,9 @@ if (loading) return <Loader />;
           <tbody>
             {admins.map(admin => (
               <tr key={admin.uid}>
+                <td>
+                  <img src={admin.image || 'default-avatar.png'} alt={admin.name} style={{width: '50px', height: '50px', objectFit: 'cover'}} />
+                </td>
                 <td>{admin.name}</td>
                 <td>{admin.surname}</td>
                 <td>{admin.email}</td>
