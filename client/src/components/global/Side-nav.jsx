@@ -8,10 +8,10 @@ export default function SideNav({show, adminDetails, isSuperAdmin}) {
     <div className={show ? 'sidebar active' : 'sidebar'}>
       <div className='profile'>
         <div className="profileImg">
-          <img src={adminDetails.image} alt="" className='prof' />
+          <img src={adminDetails?.image || '/default-avatar.png'} alt="" className='prof' />
         </div>
-        <p className="admin-name">{adminDetails.name}</p>
-        <p className="admin-email">{adminDetails.email}</p>
+        <p className="admin-name">{adminDetails?.name} {adminDetails?.surname}</p>
+        <p className="admin-email">{adminDetails?.email}</p>
         <Link to="/admin-profile" className="view-profile-link">View Profile</Link>
       </div>
       <div className="sideLinks">

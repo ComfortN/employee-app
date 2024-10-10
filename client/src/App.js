@@ -32,13 +32,14 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [adminDetails, setAdminDetails] = useState(null);
 
 
-  const adminDetails = {
-    name: 'Nqobile Ngwenya',
-    email: 'nqobie@citismart.com',
-    image: './258Comfort Ngwenya congwen022.jpg'
-  };
+  // const adminDetails = {
+  //   name: 'Nqobile Ngwenya',
+  //   email: 'nqobie@citismart.com',
+  //   image: './258Comfort Ngwenya congwen022.jpg'
+  // };
   
 
   useEffect(() => {
@@ -50,6 +51,7 @@ function App() {
           const idTokenResult = await user.getIdTokenResult();
           // setIsAdmin(!!idTokenResult.claims.admin);
           setIsSuperAdmin(user.email === 'nami@gmail.com');
+          fetchAdminDetails(user.uid);
         } catch (error) {
           console.error("Error checking admin status:", error);
         }
@@ -58,10 +60,26 @@ function App() {
       } else {
         setIsAuthenticated(false);
         setIsSuperAdmin(false)
+        setAdminDetails(null);
       }
     });
     return () => unsubscribe();
   }, []);
+
+
+  const fetchAdminDetails = async () => {
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const response = await axios.get('http://localhost:5000/api/admin/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      setAdminDetails(response.data);
+    } catch (error) {
+      console.error("Error fetching admin details:", error);
+    }
+  };
 
 
   const fetchEmployees = async () => {
@@ -174,7 +192,7 @@ function App() {
             <Route path='/all-employees' element={isAuthenticated ? <AllEmployees title="All Employees" employees={employees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
             <Route path='/former-employees' element={isAuthenticated ? <AllEmployees title="Former Employees" employees={formerEmployees} onEmployeeClick={handleEmployeeClick}/> : <Navigate to={"/login"}/>} />
             <Route path='/admin-management' element={isAuthenticated ? <AdminManagement /> : <Navigate to={"/login"}/>} />
-            <Route path='/admin-profile' element={isAuthenticated ? <AdminProfile /> : <Navigate to={"/login"}/>} />
+            <Route path='/admin-profile' element={isAuthenticated ? <AdminProfile adminDetails={adminDetails} setAdminDetails={setAdminDetails} /> : <Navigate to={"/login"}/>} />
 
           </Routes>
           
