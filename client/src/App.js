@@ -23,7 +23,8 @@ function App() {
   });
   
   const [showNav, setShowNav] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false);
+  // const [isAdmin, setIsAdmin] = useState(false);
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [employees, setEmployees] = useState([]);
   const [currentEmployee, setCurrentEmployee] = useState(null);
   const [formerEmployees, setFormerEmployees] = useState([]);
@@ -65,7 +66,8 @@ function App() {
         // Check if the user is an admin
         try {
           const idTokenResult = await user.getIdTokenResult();
-          setIsAdmin(!!idTokenResult.claims.admin);
+          // setIsAdmin(!!idTokenResult.claims.admin);
+          setIsSuperAdmin(user.email === 'admin@citismart.com');
         } catch (error) {
           console.error("Error checking admin status:", error);
         }
@@ -73,7 +75,7 @@ function App() {
         fetchFormerEmployees();
       } else {
         setIsAuthenticated(false);
-        setIsAdmin(false);
+        setIsSuperAdmin(false)
       }
     });
     return () => unsubscribe();
@@ -176,9 +178,9 @@ function App() {
           deleteEmployee={deleteEmployee}
           employees={employees}
           moveToFormer={moveToFormerEmployees}
-          isAdmin={isAdmin}
+          isSuperAdmin={isSuperAdmin}
           />
-          <SideNav show={showNav} adminDetails={adminDetails} isAdmin={isAdmin} />
+          <SideNav show={showNav} adminDetails={adminDetails} isSuperAdmin={isSuperAdmin}/>
         </>
       )}
         

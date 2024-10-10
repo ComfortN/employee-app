@@ -3,7 +3,7 @@ import './sideNav.css'
 // import { GiHamburgerMenu } from "react-icons/gi";
 import { Link } from 'react-router-dom';
 
-export default function SideNav({show, adminDetails, isAdmin}) {
+export default function SideNav({show, adminDetails, isSuperAdmin}) {
   return (
     <div className={show ? 'sidebar active' : 'sidebar'}>
       <div className='profile'>
@@ -19,7 +19,7 @@ export default function SideNav({show, adminDetails, isAdmin}) {
         <li><Link to='/'>Home</Link></li>
         <li><Link to='/all-employees'>All employees</Link></li>
         <li><Link to='/former-employees'>Former employees</Link></li>
-        <li><Link to='/admin-management'>All Admins</Link></li>
+        {isSuperAdmin && <li><Link to='/admin-management'>All Admins</Link></li>}
       </ul>
       </div>
       
