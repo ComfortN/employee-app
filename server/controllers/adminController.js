@@ -28,7 +28,7 @@ exports.login = async (req, res) => {
 };
 
 exports.addAdmin = async (req, res) => {
-  const { email, password, name, surname, age, idNumber, role } = req.body;
+  const { email, password, name, surname, age, idNumber, role, image } = req.body;
   try {
     const userRecord = await admin.auth().createUser({
       email,
@@ -42,7 +42,8 @@ exports.addAdmin = async (req, res) => {
       age,
       idNumber,
       role: role || 'admin',
-      email
+      email,
+      image
     });
 
     res.status(201).send({ uid: userRecord.uid });
