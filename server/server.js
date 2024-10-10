@@ -25,7 +25,8 @@ adminRouter.post('/login', adminController.login);
 adminRouter.post('/add', adminController.addAdmin);
 adminRouter.get('/all', adminController.getAllAdmins);
 adminRouter.delete('/remove/:uid', adminController.removeAdmin);
-adminRouter.get('/profile', adminController.getAdminProfile);
+adminRouter.get('/profile', authMiddleware, adminController.getAdminProfile);
+adminRouter.put('/profile', authMiddleware, adminController.updateAdminProfile);
 adminRouter.post('/toggle-block/:uid', adminController.toggleAdminBlock);
 
 app.use('/api/employees', router);

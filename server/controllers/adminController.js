@@ -117,6 +117,10 @@ exports.getAllAdmins = async (req, res) => {
 
 exports.getAdminProfile = async (req, res) => {
   try {
+
+    if (!req.user || !req.user.uid) {
+      return res.status(401).send('Unauthorized: No user found');
+    }
     const uid = req.user.uid;
     const adminDoc = await admin.firestore().collection('admins').doc(uid).get();
     
@@ -129,5 +133,23 @@ exports.getAdminProfile = async (req, res) => {
   } catch (error) {
     console.error('Error fetching admin profile:', error);
     res.status(500).send('Failed to fetch admin profile');
+  }
+};
+
+
+exports.updateAdminProfile = async (req, res) => {
+  const { uid } = req.params;
+  const { name, surname, age, image } = req.body;
+  try {
+    await admin.firestore().collection('admins').doc(uid).update({
+      name,
+      surname,
+      age,
+      image
+    });
+    res.send('Admin profile updated successfully');
+  } catch (error) {
+    console.error('Error updating admin profile:', error);
+    res.status(500).send('Failed to update admin profile');
   }
 };
