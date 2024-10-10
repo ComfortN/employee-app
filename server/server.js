@@ -21,10 +21,12 @@ router.get('/former', employeeController.getAllFormerEmployees);
 // Admin routes
 const adminRouter = express.Router();
 
+adminRouter.post('/login', adminController.login);
 adminRouter.post('/add', adminController.addAdmin);
 adminRouter.get('/all', adminController.getAllAdmins);
 adminRouter.delete('/remove/:uid', adminController.removeAdmin);
 adminRouter.get('/profile', adminController.getAdminProfile);
+adminRouter.post('/toggle-block/:uid', adminController.toggleAdminBlock);
 
 app.use('/api/employees', router);
 app.use('/api/admin', adminRouter);

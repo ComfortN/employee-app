@@ -1,5 +1,32 @@
 const admin = require('../firebase/firebase');
 
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    // First, get the user from Firebase Auth
+    const userRecord = await admin.auth().getUserByEmail(email);
+
+    // Then, check if the user is an admin and if they're blocked
+    const adminDoc = await admin.firestore().collection('admins').doc(userRecord.uid).get();
+    
+    if (!adminDoc.exists) {
+      return res.status(403).send('Access denied: Not an admin');
+    }
+
+    if (adminDoc.data().blocked) {
+      return res.status(403).send('Access denied: Admin account is blocked');
+    }
+
+    // If not blocked, proceed with the login
+    const token = await admin.auth().createCustomToken(userRecord.uid);
+    res.json({ token });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(401).send('Invalid email or password');
+  }
+};
+
 exports.addAdmin = async (req, res) => {
   const { email, password, name, surname, age, idNumber, role } = req.body;
   try {
@@ -24,6 +51,34 @@ exports.addAdmin = async (req, res) => {
     res.status(500).send('Failed to add admin');
   }
 };
+
+
+exports.toggleAdminBlock = async (req, res) => {
+  const { uid } = req.params;
+  try {
+    const adminRef = admin.firestore().collection('admins').doc(uid);
+    const adminDoc = await adminRef.get();
+
+    if (!adminDoc.exists) {
+      return res.status(404).send('Admin not found');
+    }
+
+    const currentStatus = adminDoc.data().blocked || false;
+    await adminRef.update({ blocked: !currentStatus });
+
+    // If blocking the admin, revoke their Firebase Auth tokens
+    if (!currentStatus) {
+      await admin.auth().revokeRefreshTokens(uid);
+    }
+
+    res.send(`Admin ${!currentStatus ? 'blocked' : 'unblocked'} successfully`);
+  } catch (error) {
+    console.error('Error toggling admin block status:', error);
+    res.status(500).send('Failed to toggle admin block status');
+  }
+};
+
+
 
 exports.removeAdmin = async (req, res) => {
   const { uid } = req.params;
@@ -61,7 +116,7 @@ exports.getAllAdmins = async (req, res) => {
 
 exports.getAdminProfile = async (req, res) => {
   try {
-    const uid = req.user.uid; // Assuming the auth middleware adds the user to the request
+    const uid = req.user.uid;
     const adminDoc = await admin.firestore().collection('admins').doc(uid).get();
     
     if (!adminDoc.exists) {
