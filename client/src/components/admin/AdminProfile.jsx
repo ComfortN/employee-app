@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { auth } from '../../firebase/firebase';
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import Loader from '../Loader/Loader';
-import './AdminProfile.css'; // Import your styles
+import './AdminProfile.css';
 
 const AdminProfile = ({ adminDetails, setAdminDetails }) => {
   const [editing, setEditing] = useState(false);
   const [localProfile, setLocalProfile] = useState(adminDetails);
   const [imagePreview, setImagePreview] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setLocalProfile(adminDetails);
@@ -16,18 +18,46 @@ const AdminProfile = ({ adminDetails, setAdminDetails }) => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
+      let imageUrl = localProfile.image;
+
+      // If there's a new image (imagePreview is set and different from the current image)
+      if (imagePreview && imagePreview !== adminDetails.image) {
+        imageUrl = await uploadImageToFirebase(imagePreview);
+      }
+
       const token = await auth.currentUser.getIdToken();
-      await axios.put('http://localhost:5000/api/admin/profile', localProfile, {
+      const updatedProfile = { ...localProfile, image: imageUrl };
+      
+      await axios.put('http://localhost:5000/api/admin/profile', updatedProfile, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      setAdminDetails(localProfile);
+      
+      setAdminDetails(updatedProfile);
       setEditing(false);
     } catch (error) {
       console.error("Error updating profile: ", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const uploadImageToFirebase = async (imageDataUrl) => {
+    const storage = getStorage();
+    const imageRef = ref(storage, `admin-profiles/${auth.currentUser.uid}`);
+    
+    // Convert data URL to blob
+    const response = await fetch(imageDataUrl);
+    const blob = await response.blob();
+    
+    // Upload to Firebase Storage
+    await uploadBytes(imageRef, blob);
+    
+    // Get the download URL
+    return await getDownloadURL(imageRef);
   };
 
   const handleImageChange = (e) => {
@@ -36,7 +66,6 @@ const AdminProfile = ({ adminDetails, setAdminDetails }) => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result);
-        setLocalProfile({ ...localProfile, image: reader.result });
       };
       reader.readAsDataURL(file);
     }
@@ -85,8 +114,12 @@ const AdminProfile = ({ adminDetails, setAdminDetails }) => {
             placeholder="ID Number"
           />
           <div className="button-group">
-            <button type="submit">Save</button>
-            <button type="button" onClick={() => setEditing(false)}>Cancel</button>
+            <button type="submit" disabled={isLoading}>
+              {isLoading ? 'Saving...' : 'Save'}
+            </button>
+            <button type="button" onClick={() => setEditing(false)} disabled={isLoading}>
+              Cancel
+            </button>
           </div>
         </form>
       ) : (
@@ -106,6 +139,7 @@ const AdminProfile = ({ adminDetails, setAdminDetails }) => {
           </div>
         </div>
       )}
+      {isLoading && <Loader />}
     </div>
   );
 };

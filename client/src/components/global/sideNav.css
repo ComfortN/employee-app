@@ -23,7 +23,7 @@
     gap: 2em;
     background: #3C5665;
     position: absolute;
-    height: 10%;
+    height: 100%;
     padding: 0 30px;
     left: -100%;
     transition: all 1s;
@@ -82,7 +82,7 @@ ul li a.active {
 @media (min-width: 768px) {
     .sidebar {
         width: 240px;
-        height: 100vh;
+        height: 100%;
         left: 0;
         transition: none;
     }

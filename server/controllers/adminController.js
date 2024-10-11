@@ -138,15 +138,29 @@ exports.getAdminProfile = async (req, res) => {
 
 
 exports.updateAdminProfile = async (req, res) => {
-  const { uid } = req.params;
+  const uid = req.user.uid; // Get the UID from the authenticated user
   const { name, surname, age, image } = req.body;
   try {
-    await admin.firestore().collection('admins').doc(uid).update({
-      name,
-      surname,
-      age,
-      image
-    });
+    const adminRef = admin.firestore().collection('admins').doc(uid);
+    const adminDoc = await adminRef.get();
+
+    if (!adminDoc.exists) {
+      return res.status(404).send('Admin profile not found');
+    }
+
+    const currentData = adminDoc.data();
+    const updateData = {
+      name: name || currentData.name,
+      surname: surname || currentData.surname,
+      age: age || currentData.age,
+    };
+
+    // Add the image field if it's provided or not already present
+    if (image || !currentData.hasOwnProperty('image')) {
+      updateData.image = image || null;
+    }
+
+    await adminRef.update(updateData);
     res.send('Admin profile updated successfully');
   } catch (error) {
     console.error('Error updating admin profile:', error);
